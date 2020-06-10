@@ -12,7 +12,31 @@ app.use((req, res, next) => {
   res.set("Access-Control-Allow-Methods", "GET,POSE,PUT,DELETE");
   next();
 });
-
+// 二级分类数据
+app.get("/admin/edu/subject/get/:parentId", (req, res) => {
+  const { parentId } = req.params;
+  const total = Random.integer(1, 5);
+  const data = Mock.mock({
+    total,
+    [`items|${total}`]: [
+      {
+        "_id|+1": 100,
+        title: "@ctitle(2,5)",
+        parentId,
+      },
+    ],
+  });
+  if (total === 1) {
+    data.items = [data.items];
+  }
+  res.json({
+    code: 20000,
+    success: true,
+    data,
+    message: "",
+  });
+});
+// 一级分类数据
 app.get("/admin/edu/subject/:page/:limit", (req, res) => {
   const { page, limit } = req.params;
   const data = Mock.mock({

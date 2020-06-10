@@ -1,31 +1,45 @@
 import React, { Component } from "react";
 import { Button, Table, Pagination } from "antd";
+import { connect } from "react-redux";
 import { PlusOutlined, DeleteOutlined, FormOutlined } from "@ant-design/icons";
 import "./index.less";
-import { reqGetSubjectList } from "@api/edu/subject";
-export default class Subject extends Component {
+import { getSubjectList, getSubSubjectList } from "./redux";
+@connect(
+  (state) => ({
+    subjectList: state.subjectList,
+  }),
+  { getSubjectList, getSubSubjectList }
+)
+class Subject extends Component {
   state = {
-    subjects: {
-      total: 0,
-      items: [],
-    },
-  };
-  getSubjectList = async (page, limit) => {
-    const result = await reqGetSubjectList(page, limit);
-    this.setState({
-      subjects: result,
-    });
+    expandedRowKeys: [],
   };
   componentDidMount() {
-    this.getSubjectList(1, 10);
+    this.props.getSubjectList(1, 10);
   }
-  handleChangePage = () => {};
   handleChangeShowSize = (current, size) => {
     // console.log(current, size);
-    this.getSubjectList(current, size);
+    this.props.getSubjectList(current, size);
+  };
+  handleExpand = (expanded, record) => {
+    if (!expanded) return;
+    this.props.getSubSubjectList(record._id);
+  };
+  handleExpandedRowsChange = (expandedRowKeys) => {
+    console.log(expandedRowKeys);
+    const length = expandedRowKeys.length;
+    if (length > this.state.expandedRowKeys.length) {
+      const lastKey = expandedRowKeys[length - 1];
+      this.props.getSubSubjectList(lastKey);
+    }
+    // 更新状态里面的数据
+    this.setState({
+      expandedRowKeys,
+    });
   };
   render() {
-    const { subjects } = this.state;
+    const { expandedRowKeys } = this.props;
+    const { subjectList, getSubjectList } = this.props;
     const columns = [
       { title: "分类名称", dataIndex: "title", key: "title" },
       {
@@ -45,17 +59,6 @@ export default class Subject extends Component {
         ),
       },
     ];
-
-    /* const data = [
-      {
-        key: 1,
-        name: "John Brown",
-        age: 32,
-        address: "New York No. 1 Lake Park",
-        description:
-          "My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.",
-      },
-    ]; */
     return (
       <div className="subject">
         <Button type="primary">
@@ -66,20 +69,39 @@ export default class Subject extends Component {
           style={{ marginTop: 20 }}
           columns={columns}
           expandable={{
-            expandedRowRender: (record) => (
-              <p style={{ margin: 0 }}>{record.description}</p>
-            ),
-            rowExpandable: (record) => record.name !== "Not Expandable",
+            expandedRowKeys,
+            onExpandedRowsChange: this.handleExpandedRowsChange,
+            // 决定行展开时显示什么样的内容
+            /* expandedRowRender: (record) => {
+              const children = record.children ? record.children : [];
+              // console.log(children); 当二级菜单里面只有一个值的时候返回的是一个对象不是一个数组
+              return children.map((subSubject) => {
+                return (
+                  <div key={subSubject._id} className="sub-subject">
+                    <div>{subSubject.title}</div>
+                    <div className="sub-subject-right">
+                      <Button type="primary">
+                        <FormOutlined />
+                      </Button>
+                      <Button type="danger">
+                        <DeleteOutlined />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              });
+            }, */
+            // onExpand: this.handleExpand,
           }}
-          dataSource={subjects.items} // 决定每一行显示的数据
+          dataSource={subjectList.items} // 决定每一行显示的数据
           rowKey="_id"
           pagination={{
-            total: subjects.total,
+            total: subjectList.total,
             showQuickJumper: true,
             showSizeChanger: true,
             defaultPageSize: 10,
             pageSizeOptions: ["5", "10", "15", "20"],
-            onChange: this.getSubjectList,
+            onChange: getSubjectList,
             onShowSizeChange: this.handleChangeShowSize,
           }}
         />
@@ -87,3 +109,4 @@ export default class Subject extends Component {
     );
   }
 }
+export default Subject;

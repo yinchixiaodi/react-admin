@@ -10,3 +10,11 @@ export function reqGetSubjectList(page, limit) {
     method: "GET",
   });
 }
+
+// 获取二级分类列表
+export function reqGetSubSubjectList(parentId) {
+  return request({
+    url: `${MOCK_BASE_URL}/get/${parentId}`,
+    method: "GET",
+  });
+}
