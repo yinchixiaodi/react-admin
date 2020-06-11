@@ -5,12 +5,29 @@ const app = express();
 // 随机类
 const Random = Mock.Random;
 
+// 使用解析POST和PUT请求的请求体参数的中间件
+app.use(express.json());
+
 app.use((req, res, next) => {
   // 设置响应头
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Headers", "conten-type,token");
   res.set("Access-Control-Allow-Methods", "GET,POSE,PUT,DELETE");
   next();
+});
+// 添加分类数据
+app.post("/admin/edu/subject/save", (req, res) => {
+  const { title, parentId } = req.body;
+  res.json({
+    code: 20000,
+    success: true,
+    data: {
+      _id: Date.now(),
+      title,
+      parentId,
+    },
+    message: "",
+  });
 });
 // 二级分类数据
 app.get("/admin/edu/subject/get/:parentId", (req, res) => {

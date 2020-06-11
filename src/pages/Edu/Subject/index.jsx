@@ -37,6 +37,9 @@ class Subject extends Component {
       expandedRowKeys,
     });
   };
+  addSubject = () => {
+    this.props.history.push("/edu/subject/add");
+  };
   render() {
     const { expandedRowKeys } = this.props;
     const { subjectList, getSubjectList } = this.props;
@@ -61,7 +64,7 @@ class Subject extends Component {
     ];
     return (
       <div className="subject">
-        <Button type="primary">
+        <Button type="primary" onClick={this.addSubject}>
           <PlusOutlined />
           新建
         </Button>

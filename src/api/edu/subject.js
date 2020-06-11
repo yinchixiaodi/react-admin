@@ -18,3 +18,16 @@ export function reqGetSubSubjectList(parentId) {
     method: "GET",
   });
 }
+
+// 添加课程分类
+// http://47.103.203.152/admin/edu/subject/save
+export function reqAddSubject(title, parentId) {
+  return request({
+    url: `${MOCK_BASE_URL}/save`,
+    method: "POST",
+    data: {
+      title,
+      parentId,
+    },
+  });
+}
