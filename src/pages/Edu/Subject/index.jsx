@@ -121,7 +121,7 @@ class Subject extends Component {
           // 重新请求列表数据
           const { current, pageSize } = this.state;
 
-          // 如果当前不是在第一页，并且这一页只有一条数据，而且是一级分类
+          // 如果当前不是在第一页，并且这一页只有一条数据，且是一级分类
           if (
             current > 1 &&
             this.props.subjectList.items.length === 1 &&
