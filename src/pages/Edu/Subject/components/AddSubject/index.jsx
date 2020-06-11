@@ -16,6 +16,9 @@ function AddSubject({ total, getSubjectList, history }) {
     wrapperCol: { span: 6 },
   };
   useEffect(() => {
+    // 相当于compontentDidMount
+    // 每次点击增加的时候后将page置为1
+    page = 1;
     const fetchData = async () => {
       const items = await getSubjectList(page++, 10);
       // console.log(items);

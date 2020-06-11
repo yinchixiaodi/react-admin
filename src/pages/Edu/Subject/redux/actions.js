@@ -2,8 +2,16 @@
 同步action返回action对象
 异步action返回函数
 */
-import { reqGetSubjectList, reqGetSubSubjectList } from "@api/edu/subject";
-import { GET_SUBJECT_LIST, GET_SUB_SUBJECT_LIST } from "./constants";
+import {
+  reqGetSubjectList,
+  reqGetSubSubjectList,
+  reqUpdateSubject,
+} from "@api/edu/subject";
+import {
+  GET_SUBJECT_LIST,
+  GET_SUB_SUBJECT_LIST,
+  GET_UPDATE_SUBJECT,
+} from "./constants";
 const getSubjectListSync = (subjectList) => ({
   type: GET_SUBJECT_LIST,
   data: subjectList,
@@ -30,6 +38,20 @@ export const getSubSubjectList = (parentId) => {
         getSubSubjectListSync({ parentId, subSubjectList: response.items })
       );
       return response;
+    });
+  };
+};
+
+// 异步更新课程分类列表
+const getUpdateSubjectSync = (data) => ({
+  type: GET_UPDATE_SUBJECT,
+  data,
+});
+export const getUpdateSubject = (title, id) => {
+  return (dispatch) => {
+    return reqUpdateSubject(title, id).then((response) => {
+      dispatch(getUpdateSubjectSync({ title, _id: id }));
+      return { title, _id: id };
     });
   };
 };
