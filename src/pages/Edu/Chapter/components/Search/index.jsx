@@ -1,19 +1,24 @@
 import React, { useEffect } from "react";
-import { Form, Select, Button } from "antd";
+import { Form, Select, Button, message } from "antd";
 import { connect } from "react-redux";
-import { getAllCourseList } from "../../redux";
+import { getAllCourseList, getChapterList } from "../../redux";
 import "./index.less";
 const { Option } = Select;
-function Search({ getAllCourseList, allCourseList }) {
+function Search({ getAllCourseList, allCourseList, getChapterList }) {
   useEffect(() => {
     getAllCourseList();
   }, [getAllCourseList]);
-  const finish = () => {};
+  // 点击查询课程章节执行的回调函数
+  const finish = async ({ courseId }) => {
+    // console.log(values);
+    await getChapterList({ page: 1, limit: 10, courseId });
+    message.success("查询课程章节成功");
+  };
   return (
     <Form className="form-course" onFinish={finish} layout="inline">
       <Form.Item
         label="课程"
-        name="title"
+        name="courseId"
         rules={[{ required: true, message: "请选择课程" }]}
       >
         <Select className="form-select" placeholder="请选择课程">
@@ -39,5 +44,5 @@ export default connect(
   (state) => ({
     allCourseList: state.chapter.allCourseList,
   }),
-  { getAllCourseList }
+  { getAllCourseList, getChapterList }
 )(Search);
