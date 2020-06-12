@@ -1,0 +1,1 @@
+export const ALL_COURSE_LIST = "ALL_COURSE_LIST";
