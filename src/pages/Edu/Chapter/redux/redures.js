@@ -1,4 +1,10 @@
-import { ALL_COURSE_LIST, CHAPTER_LIST, LESSON_LIST } from "./constants";
+import {
+  ALL_COURSE_LIST,
+  CHAPTER_LIST,
+  LESSON_LIST,
+  BATCH_REMOVE_CHAPTER_LIST,
+  BATCH_REMOVE_LESSON_LIST,
+} from "./constants";
 
 const initChaper = {
   allCourseList: [],
@@ -41,6 +47,27 @@ export default function chapter(prevState = initChaper, action) {
               };
             }
             return item;
+          }),
+        },
+      };
+    case BATCH_REMOVE_LESSON_LIST:
+      return {
+        ...prevState,
+        chapters: {
+          total: prevState.chapters.total,
+          items: prevState.chapters.items.map((item) => {
+            // 找到要更新的课时数据
+            let children = item.children;
+            if (children && children.length) {
+              // 过滤掉已经选中的
+              children = children.filter((child) => {
+                return action.data.indexOf(child._id === -1);
+              });
+            }
+            return {
+              ...item,
+              children,
+            };
           }),
         },
       };

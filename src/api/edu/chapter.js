@@ -14,3 +14,15 @@ export function reqGetChapterList({ page, limit, courceId }) {
     },
   });
 }
+
+// 批量删除多个章节
+// http://47.103.203.152/admin/edu/chapter/batchRemove
+export function reqBatchRemoveChapterList(idList) {
+  return request({
+    url: `${BASE_URL}/batchRemove`,
+    method: "DELETE",
+    data: {
+      idList,
+    },
+  });
+}

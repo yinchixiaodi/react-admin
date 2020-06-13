@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import { Tooltip, Button, Alert, Table } from "antd";
+import { Tooltip, Button, Alert, Table, message } from "antd";
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+import screenfull from "screenfull";
 import {
   PlusOutlined,
   FullscreenOutlined,
@@ -9,13 +11,19 @@ import {
   FormOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import { getLessonList, batchRemoveLessonList } from "../../redux";
 import "./index.less";
-import { getLessonList } from "../../redux";
 
-@connect((state) => ({ chapters: state.chapter.chapters }), { getLessonList })
+// withRouter的作用是给非路由组件传递路由组件的三大属性
+@withRouter
+@connect((state) => ({ chapters: state.chapter.chapters }), {
+  getLessonList,
+  batchRemoveLessonList,
+})
 class List extends Component {
   state = {
     expandedRowKeys: [],
+    selectedRowKeys: [],
   };
   handleExpandedRowsChange = (expandedRowKeys) => {
     // 每次展开并请求数据的是 expandedRowKeys 数组的最后一个
@@ -29,9 +37,55 @@ class List extends Component {
       expandedRowKeys,
     });
   };
+  // 点击添加课时数据
+  handleAddLesson = (chapter) => {
+    // console.log(chapter);
+    return () => {
+      this.props.history.push("/edu/chapter/addlesson", chapter);
+    };
+  };
+  // 获取已经选中的章节/课时的id列表
+  onSelectChange = (selectedRowKeys) => {
+    this.setState({
+      selectedRowKeys,
+    });
+  };
+  // 批量删除选中的章节或者课时
+  batchRemoveChapter = async () => {
+    // 分别将章节id和课时id存起来
+    const { selectedRowKeys } = this.state;
+    console.log(selectedRowKeys); // 所有选中的id
+    const {
+      // 将 chapters 进行解构赋值，获取到items，然后将items重命名
+      chapters: { items: chapters },
+      batchRemoveLessonList,
+    } = this.props;
+    // 遍历每一个元素，看其_id是否匹配上selectedRowKeys里面的某项值，如果匹配上说明要删除
+    const ids = Array.from(selectedRowKeys); // 剩下的就是课时id
+    console.log(ids); // 所有选中的课时id
+    // 章节id列表
+    const chaptersId = [];
+    chapters.forEach((chapter) => {
+      const index = ids.indexOf(chapter._id);
+      if (index > -1) {
+        // 说明是章节id
+        // 删除index对应的元素
+        const [id] = ids.splice(index, 1);
+        chaptersId.push(id);
+        console.log(chaptersId);
+      }
+    });
+    await batchRemoveLessonList(ids);
+    message.success("批量删除课时成功");
+  };
+  // 点击全屏显示
+  screenfull = () => {
+    const dom = this.props.screenfullRef.current;
+    screenfull.toggle(dom);
+  };
   render() {
     const { chapters } = this.props;
-    const { expandedRowKeys } = this.state;
+    const { expandedRowKeys, selectedRowKeys } = this.state;
     const columns = [
       {
         title: "名称",
@@ -55,7 +109,7 @@ class List extends Component {
             <>
               {"free" in data ? null : (
                 <Tooltip title="增加课时">
-                  <Button type="primary">
+                  <Button type="primary" onClick={this.handleAddLesson(data)}>
                     <PlusOutlined />
                   </Button>
                 </Tooltip>
@@ -82,11 +136,13 @@ class List extends Component {
           <div className="table-header-right">
             <Button type="primary">
               <PlusOutlined />
-              新增
+              新增章节
             </Button>
-            <Button type="danger">批量删除</Button>
+            <Button type="danger" onClick={this.batchRemoveChapter}>
+              批量删除
+            </Button>
             <Tooltip title="全屏">
-              <FullscreenOutlined />
+              <FullscreenOutlined onClick={this.screenfull} />
             </Tooltip>
             <Tooltip title="刷新">
               <ReloadOutlined />
@@ -100,6 +156,11 @@ class List extends Component {
         <Table
           style={{ marginTop: 20 }}
           columns={columns} // 决定列头
+          // 批量删除
+          rowSelection={{
+            selectedRowKeys,
+            onChange: this.onSelectChange,
+          }}
           expandable={{
             // 有children属性才会有展开图标
             expandedRowKeys,
