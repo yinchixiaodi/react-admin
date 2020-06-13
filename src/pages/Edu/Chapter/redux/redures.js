@@ -50,6 +50,22 @@ export default function chapter(prevState = initChaper, action) {
           }),
         },
       };
+    case BATCH_REMOVE_CHAPTER_LIST:
+      return {
+        ...prevState,
+        chapters: {
+          total: prevState.chapters.total,
+          items: prevState.chapters.items.map((item) => {
+            if (item._id === action.data.chapterId) {
+              return {
+                ...item,
+                children: action.data.lessons,
+              };
+            }
+            return item;
+          }),
+        },
+      };
     case BATCH_REMOVE_LESSON_LIST:
       return {
         ...prevState,
@@ -61,7 +77,7 @@ export default function chapter(prevState = initChaper, action) {
             if (children && children.length) {
               // 过滤掉已经选中的
               children = children.filter((child) => {
-                return action.data.indexOf(child._id === -1);
+                return action.data.indexOf(child._id) === -1;
               });
             }
             return {

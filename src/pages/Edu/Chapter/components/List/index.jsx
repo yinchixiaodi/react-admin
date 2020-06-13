@@ -11,7 +11,11 @@ import {
   FormOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { getLessonList, batchRemoveLessonList } from "../../redux";
+import {
+  getLessonList,
+  batchRemoveLessonList,
+  batchRemoveChapterList,
+} from "../../redux";
 import "./index.less";
 
 // withRouter的作用是给非路由组件传递路由组件的三大属性
@@ -19,6 +23,7 @@ import "./index.less";
 @connect((state) => ({ chapters: state.chapter.chapters }), {
   getLessonList,
   batchRemoveLessonList,
+  batchRemoveChapterList,
 })
 class List extends Component {
   state = {
@@ -58,6 +63,7 @@ class List extends Component {
     const {
       // 将 chapters 进行解构赋值，获取到items，然后将items重命名
       chapters: { items: chapters },
+      batchRemoveChapterList,
       batchRemoveLessonList,
     } = this.props;
     // 遍历每一个元素，看其_id是否匹配上selectedRowKeys里面的某项值，如果匹配上说明要删除
@@ -72,9 +78,11 @@ class List extends Component {
         // 删除index对应的元素
         const [id] = ids.splice(index, 1);
         chaptersId.push(id);
-        console.log(chaptersId);
       }
     });
+    console.log(chaptersId);
+    // console.log(ids);
+    await batchRemoveChapterList(chaptersId);
     await batchRemoveLessonList(ids);
     message.success("批量删除课时成功");
   };
