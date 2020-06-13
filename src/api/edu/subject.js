@@ -3,7 +3,7 @@ import request from "@utils/request";
 const BASE_URL = "/admin/edu/subject";
 // const MOCK_BASE_URL = `http://localhost:9527${BASE_URL}`;
 
-// 获取一级分类列表
+// 获取一级分类列表分页数据
 export function reqGetSubjectList(page, limit) {
   return request({
     url: `${BASE_URL}/${page}/${limit}`,
@@ -51,5 +51,13 @@ export function reqRemoveSubject(id) {
   return request({
     url: `${BASE_URL}/remove/${id}`,
     method: "DELETE",
+  });
+}
+
+// 获取所有一级分类列表id
+export function reqGetAllSubjectList() {
+  return request({
+    url: `${BASE_URL}`,
+    method: "GET",
   });
 }
