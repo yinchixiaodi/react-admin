@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Select, Cascader, Button } from "antd";
+import { connect } from "react-redux";
 import { reqGetAllTeacherList } from "@api/edu/teacher";
 import { reqGetAllSubjectList, reqGetSubSubjectList } from "@api/edu/subject";
+import { getCourseList } from "../../redux";
 import "./index.less";
 
 const { Option } = Select;
 
-function Search() {
+function Search({ getCourseList, getSearchFormData }) {
   const [form] = Form.useForm();
   const [teachers, setTeachers] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -43,18 +45,6 @@ function Search() {
     };
     fetchData();
   }, []);
-  const [options, setOptions] = useState([
-    {
-      value: "zhejiang",
-      label: "Zhejiang",
-      isLeaf: false,
-    },
-    {
-      value: "jiangsu",
-      label: "Jiangsu",
-      isLeaf: false,
-    },
-  ]);
 
   const onChange = (value, selectedOptions) => {
     console.log(value, selectedOptions);
@@ -90,9 +80,33 @@ function Search() {
   const resetForm = () => {
     form.resetFields();
   };
-
+  // 提交表单
+  const finish = async (values) => {
+    console.log(values);
+    // 发送请求
+    const { subject = [], teacherId, title } = values;
+    let subjectId, subjectParentId;
+    if (subject.length === 1) {
+      subjectParentId = "0";
+      subjectId = subject[0];
+    } else if (subject.length === 2) {
+      subjectParentId = subject[0];
+      subjectId = subject[1];
+    }
+    await getCourseList({
+      page: 1,
+      limit: 10,
+      teacherId,
+      subjectId,
+      subjectParentId,
+      title,
+    });
+    // 调用父组件传递的方法，修改父组件的数据
+    getSearchFormData({ teacherId, title, subjectId, subjectParentId });
+    // message.success("获取课程分页数据成功");
+  };
   return (
-    <Form layout="inline" form={form}>
+    <Form layout="inline" form={form} onFinish={finish}>
       <Form.Item name="title" label="标题">
         <Input placeholder="课程标题" style={{ width: 250, marginRight: 20 }} />
       </Form.Item>
@@ -148,4 +162,4 @@ function Search() {
   );
 }
 
-export default Search;
+export default connect(null, { getCourseList })(Search);
