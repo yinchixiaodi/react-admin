@@ -12,6 +12,7 @@ import {
 } from "@ant-design/icons";
 
 import { connect } from "react-redux";
+import screenfull from "screenfull";
 import Search from "./components/Search";
 import { getCourseList } from "./redux";
 
@@ -38,7 +39,7 @@ class Course extends Component {
     previewImage: "",
     searchData: {},
   };
-
+  screenfulRef = React.createRef();
   search = (searchName) => {
     this.setState({
       searchLoading: true,
@@ -227,6 +228,11 @@ class Course extends Component {
   changeTable = (pagination, filters, sorter) => {
     console.log(pagination, filters, sorter);
   };
+  // 点击全屏显示
+  screenful = () => {
+    const dom = this.screenfulRef.current;
+    screenfull.toggle(dom);
+  };
   render() {
     const {
       page,
@@ -252,7 +258,7 @@ class Course extends Component {
           <Search getSearchFormData={this.getSearchFormData} />
         </div>
 
-        <div className="course-table">
+        <div className="course-table" ref={this.screenfulRef}>
           <div className="course-table-header">
             <h3>课程数据列表</h3>
             <div>
@@ -260,7 +266,11 @@ class Course extends Component {
                 <PlusOutlined />
                 <span>新建</span>
               </Button>
-              <Tooltip title="全屏" className="course-table-btn">
+              <Tooltip
+                title="全屏"
+                className="course-table-btn"
+                onClick={this.screenful}
+              >
                 <FullscreenOutlined />
               </Tooltip>
               <Tooltip title="刷新" className="course-table-btn">
