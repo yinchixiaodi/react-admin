@@ -1,19 +1,11 @@
-import React, { Component } from "react";
-
-import Analysis from "./Analysis";
-import Monitor from "./Monitor";
-import Search from "./Search";
-import Statistics from "./Statistics";
-
-export default class Admin extends Component {
-  render() {
-    return (
-      <div>
-        <Analysis />
-        <Monitor />
-        <Search />
-        <Statistics />
-      </div>
-    );
-  }
+import React from "react";
+import Visits from "./components/Visits";
+import Sales from "./components/Sales";
+export default function Admin() {
+  return (
+    <div>
+      <Visits />
+      <Sales />
+    </div>
+  );
 }
