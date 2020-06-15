@@ -1,6 +1,12 @@
 import React from "react";
 import { Router } from "react-router-dom";
 import { IntlProvider } from "react-intl";
+import { connect } from "react-redux";
+
+import { ConfigProvider } from "antd";
+import enUS from "antd/es/locale/en_US";
+import zhCN from "antd/es/locale/zh_CN";
+
 import history from "@utils/history";
 
 //
@@ -19,17 +25,19 @@ import "./assets/css/reset.css";
 // messages["en"] = en;
 //
 
-function App() {
-  const local = "zh"; // 当前使用的语言环境
-  const messages = local === "en" ? en : zh; // 加载要使用的语音包
+function App({ language }) {
+  const messages = language === "en" ? en : zh; // 加载要使用的语音包
+  const locale = language === "en" ? enUS : zhCN; // 加载要使用的语音包
 
   return (
     <Router history={history}>
-      <IntlProvider local={local} messages={messages}>
-        <Layout />
-      </IntlProvider>
+      <ConfigProvider locale={locale}>
+        <IntlProvider locale={language} messages={messages}>
+          <Layout />
+        </IntlProvider>
+      </ConfigProvider>
     </Router>
   );
 }
 
-export default App;
+export default connect((state) => ({ language: state.language }))(App);

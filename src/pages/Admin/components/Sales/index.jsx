@@ -169,7 +169,7 @@ export default class Sales extends Component {
     );
     return (
       <Card
-        style={{ width: "100%" }}
+        style={{ width: "100%", marginBottom: 20 }}
         tabList={tabList}
         activeTabKey={tabkey}
         tabBarExtraContent={extra}
