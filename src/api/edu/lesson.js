@@ -22,3 +22,13 @@ export function reqBatchRemoveLessonList(idList) {
     },
   });
 }
+
+// 添加课时
+// http://47.103.203.152/admin/edu/lesson/save
+export function reqAddLesson({ chapterId, title, free, video }) {
+  return request({
+    url: `${BASE_URL}/save`,
+    method: "POST",
+    data: { chapterId, title, free, video },
+  });
+}
