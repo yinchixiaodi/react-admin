@@ -1,4 +1,5 @@
 import { reqLogin, reqLogout } from "@api/acl/login";
+import { reqMobileLogin } from "@api/acl/oauth";
 import { LOGIN_SUCCESS, REMOVE_TOKEN } from "../constants/login";
 
 /**
@@ -8,7 +9,7 @@ const loginSync = (token) => ({
   type: LOGIN_SUCCESS,
   data: token,
 });
-
+// 账号密码登录
 export const login = (username, password) => {
   return (dispatch) => {
     return reqLogin(username, password).then(({ token }) => {
@@ -17,6 +18,16 @@ export const login = (username, password) => {
     });
   };
 };
+// 手机号登录
+export const mobileLogin = (mobile, code) => {
+  return (dispatch) => {
+    return reqMobileLogin(mobile, code).then(({ token }) => {
+      dispatch(loginSync(token));
+      return token;
+    });
+  };
+};
+
 /**
  * 删除token
  */

@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { Tabs, Form, Input, Row, Col, Button, Checkbox } from "antd";
+import { Tabs, Form, Input, Row, Col, Button, Checkbox, message } from "antd";
 import {
   UserOutlined,
   LockOutlined,
@@ -10,7 +10,8 @@ import {
   QqOutlined,
   WechatOutlined,
 } from "@ant-design/icons";
-import { login } from "@redux/actions/login";
+import { login, mobileLogin } from "@redux/actions/login";
+import { reqSendCode } from "@api/acl/oauth";
 import "./index.less";
 
 const { TabPane } = Tabs;
@@ -33,32 +34,93 @@ const rules = [
 const validateMessages = {
   required: "请输入${name}!",
 };
-function LoginForm({ login, history }) {
+// 定义重新发送验证码的时间
+const TIME = 60;
+let countingDownTime = TIME;
+function LoginForm({ login, mobileLogin, history }) {
+  const [form] = Form.useForm();
+  const [, setCountingDownTime] = useState(0);
+  const [isSendCode, setIsSendCode] = useState(false);
+  const [activeKey, setActiveKey] = useState("user");
   const changeLogin = (key) => {
-    console.log(key);
+    setActiveKey(key);
   };
   // 点击登录
-  const finish = async (values) => {
-    console.log(values);
-    const { username, password, rem } = values;
-    // 发送请求
-    const token = await login(username, password);
-    // 请求成功
-    // 保存token
-    if (rem) {
-      localStorage.setItem("user_token", token);
+  const finish = async () => {
+    if (activeKey === "user") {
+      form
+        .validateFields(["username", "password", "rem"])
+        .then(async (values) => {
+          const { username, password, rem } = values;
+          // 发送请求
+          const token = await login(username, password);
+          // 请求成功
+          // 保存token
+          if (rem) {
+            localStorage.setItem("user_token", token);
+          }
+          // 跳转到首页
+          history.replace("/");
+        });
+      return;
     }
-    // 跳转到首页
-    history.replace("/");
+    form.validateFields(["mobile", "code", "rem"]).then(async (values) => {
+      const { mobile, code, rem } = values;
+      // 发送请求
+      const token = await mobileLogin(mobile, code);
+      // 请求成功
+      // 保存token
+      if (rem) {
+        localStorage.setItem("user_token", token);
+      }
+      // 跳转到首页
+      history.replace("/");
+    });
+  };
+  // 定义重新获取验证码倒计时的方法
+  const countingDown = () => {
+    // 设置循环定时器
+    const timer = setInterval(() => {
+      countingDownTime--;
+      //   console.log(countingDownTime);
+      if (countingDownTime <= 0) {
+        // 清除定时器
+        clearInterval(timer);
+        // 将 countingDownTime 的值置为60
+        countingDownTime = TIME;
+        // 更新按钮的状态
+        setIsSendCode(false);
+        return;
+      }
+      setCountingDownTime(countingDownTime);
+    }, 1000);
+  };
+  // 获取验证码
+  const getCode = () => {
+    form
+      .validateFields(["mobile"])
+      .then(async ({ mobile }) => {
+        console.log(mobile); // 输入的手机号
+        // 获取到手机号之后发送请求
+        await reqSendCode(mobile);
+        // 发送请求成功之后应该修改按钮的显示状态
+        setIsSendCode(true);
+        countingDown();
+        message.success("发送验证码成功");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   return (
     <Form
+      form={form}
       validateMessages={validateMessages}
       initialValues={{ rem: true }}
-      onFinish={finish}
+      // onFinish={finish}
     >
       <div className="login-form-header">
-        <Tabs defaultActiveKey="1" onChange={changeLogin}>
+        <Tabs activeKey={activeKey} onChange={changeLogin}>
           <TabPane tab="账户密码登陆" key="user">
             <Form.Item name="username" rules={rules}>
               <Input prefix={<UserOutlined />} className="form-input" />
@@ -91,7 +153,7 @@ function LoginForm({ login, history }) {
                   rules={[
                     { required: true, message: "请输入验证码" },
                     {
-                      pattern: /^[0,9]{6}$/,
+                      pattern: /^[0-9]{6}$/,
                       message: "请输入正确的验证码",
                     },
                   ]}
@@ -101,7 +163,11 @@ function LoginForm({ login, history }) {
               </Col>
               <Col>
                 <Form.Item>
-                  <Button>获取验证码</Button>
+                  <Button onClick={getCode} disabled={isSendCode}>
+                    {isSendCode
+                      ? `${countingDownTime}秒后可重发`
+                      : "获取验证码"}
+                  </Button>
                 </Form.Item>
               </Col>
             </Row>
@@ -120,7 +186,7 @@ function LoginForm({ login, history }) {
           </Col>
         </Row>
         <Form.Item>
-          <Button type="primary" className="login-form-btn" htmlType="submit">
+          <Button type="primary" className="login-form-btn" onClick={finish}>
             登录
           </Button>
         </Form.Item>
@@ -145,4 +211,4 @@ function LoginForm({ login, history }) {
     </Form>
   );
 }
-export default withRouter(connect(null, { login })(LoginForm));
+export default withRouter(connect(null, { login, mobileLogin })(LoginForm));
