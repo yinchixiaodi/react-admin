@@ -18,10 +18,11 @@ export function getInfo() {
 }
 
 // 登录
+// http://47.103.203.152/admin/acl/index/login
 export function reqLogin(username, password) {
   return request({
     url: `${BASE_URL}/login`,
-    method: "post",
+    method: "POST",
     data: {
       username,
       password,
