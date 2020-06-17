@@ -5,7 +5,7 @@ import { LOGIN_SUCCESS, REMOVE_TOKEN } from "../constants/login";
 /**
  * 登陆
  */
-const loginSync = (token) => ({
+export const loginSync = (token) => ({
   type: LOGIN_SUCCESS,
   data: token,
 });

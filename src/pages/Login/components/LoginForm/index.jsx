@@ -12,6 +12,7 @@ import {
 } from "@ant-design/icons";
 import { login, mobileLogin } from "@redux/actions/login";
 import { reqSendCode } from "@api/acl/oauth";
+import { CLIENT_ID } from "@conf/oauth";
 import "./index.less";
 
 const { TabPane } = Tabs;
@@ -112,6 +113,11 @@ function LoginForm({ login, mobileLogin, history }) {
         console.log(err);
       });
   };
+  // 第三方登录-Github
+  const goGithub = () => {
+    console.log(window.location);
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}`;
+  };
   return (
     <Form
       form={form}
@@ -195,7 +201,7 @@ function LoginForm({ login, mobileLogin, history }) {
             <Form.Item>
               <div className="otherLogin">
                 <span>其他登录方式</span>
-                <GithubOutlined />
+                <GithubOutlined onClick={goGithub} />
                 <QqOutlined />
                 <WechatOutlined />
               </div>
