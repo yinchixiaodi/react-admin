@@ -1,25 +1,24 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import { Switch, Route } from "react-router-dom";
-
 import { constantRoutes } from "@conf/routes";
-
-class PublicLayout extends Component {
-  renderRoute = (routes) => {
+export default class PublicLayout extends Component {
+  renderRouter = (routes) => {
     return routes.map((route) => {
       return (
         <Route
           key={route.path}
           path={route.path}
           component={route.component}
-          exact={true}
+          exact
         />
       );
     });
   };
-
   render() {
-    return <Switch>{this.renderRoute(constantRoutes)}</Switch>;
+    return (
+      <Suspense fallback={<h1>loading...</h1>}>
+        <Switch>{this.renderRouter(constantRoutes)}</Switch>
+      </Suspense>
+    );
   }
 }
-
-export default PublicLayout;
