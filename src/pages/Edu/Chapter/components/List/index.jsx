@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Tooltip, Button, Alert, Table, message } from "antd";
+import { Tooltip, Button, Alert, Table, message, Modal } from "antd";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import screenfull from "screenfull";
@@ -10,7 +10,9 @@ import {
   SettingOutlined,
   FormOutlined,
   DeleteOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
+import Player from "griffith";
 import {
   getLessonList,
   batchRemoveLessonList,
@@ -29,6 +31,8 @@ class List extends Component {
   state = {
     expandedRowKeys: [],
     selectedRowKeys: [],
+    lesson: {},
+    visible: false,
   };
   handleExpandedRowsChange = (expandedRowKeys) => {
     // 每次展开并请求数据的是 expandedRowKeys 数组的最后一个
@@ -91,9 +95,25 @@ class List extends Component {
     const dom = this.props.screenfullRef.current;
     screenfull.toggle(dom);
   };
+  // 点击显示视频
+  showVideoModal = (lesson) => {
+    return () => {
+      this.setState({
+        visible: true,
+        lesson,
+      });
+    };
+  };
+  // 点击隐藏Modal
+  handleCancel = () => {
+    this.setState({
+      visible: false,
+      lesson: {},
+    });
+  };
   render() {
     const { chapters } = this.props;
-    const { expandedRowKeys, selectedRowKeys } = this.state;
+    const { expandedRowKeys, selectedRowKeys, lesson, visible } = this.state;
     const columns = [
       {
         title: "名称",
@@ -106,6 +126,21 @@ class List extends Component {
         key: "free",
         render: (free) => {
           return free === undefined ? "" : free ? "是" : "否";
+        },
+      },
+      {
+        title: "视频",
+        key: "video",
+        render: (lesson) => {
+          return (
+            "video" in lesson && (
+              <Tooltip title="预览视频">
+                <Button onClick={this.showVideoModal(lesson)}>
+                  <EyeOutlined />
+                </Button>
+              </Tooltip>
+            )
+          );
         },
       },
       {
@@ -188,6 +223,22 @@ class List extends Component {
             // onShowSizeChange: this.handleChangeShowSize,
           }}
         />
+        <Modal
+          title={lesson.title}
+          visible={visible}
+          onCancel={this.handleCancel}
+          footer={null}
+          destroyOnClose={true}
+          centered={true}
+        >
+          <Player
+            sources={{
+              hd: {
+                play_url: lesson.video,
+              },
+            }}
+          />
+        </Modal>
       </div>
     );
   }

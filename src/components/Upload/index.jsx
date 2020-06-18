@@ -5,6 +5,7 @@ import * as qiniu from "qiniu-js";
 // 轻量级的库，专门用来生成唯一id的库
 import { nanoid } from "nanoid";
 import { reqGetToken } from "@api/edu/upload";
+import qiniuConfig from "@conf/qiniu";
 import "./index.less";
 
 const MAX_VIDEO_SIZE = 35 * 1024 * 1024;
@@ -93,7 +94,7 @@ export default class Upload extends Component {
     };
     const config = {
       // useCdnDomain: true,
-      region: qiniu.region.z1,
+      region: qiniuConfig.region,
     };
     //创建上传文件的对象
     const observable = qiniu.upload(file, key, uploadToken, putExtra, config);
@@ -114,7 +115,7 @@ export default class Upload extends Component {
         // 上传成功调用的
         onSuccess(res);
         message.success("上传成功");
-        const video = "http://qbsmcjcr1.bkt.clouddn.com/uK4yfwW6CN" + res.key;
+        const video = qiniuConfig.prefix_url + res.key;
         this.props.onChange(video);
       },
     };
