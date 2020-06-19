@@ -232,6 +232,7 @@ class List extends Component {
           centered={true}
         >
           <Player
+            // cover={lesson.image}
             sources={{
               hd: {
                 play_url: lesson.video,

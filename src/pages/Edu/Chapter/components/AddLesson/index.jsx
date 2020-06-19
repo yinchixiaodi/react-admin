@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Button, PageHeader, Switch, Input, Card, message } from "antd";
 import Upload from "@comps/Upload";
+import UploadImage from "@comps/UploadImage";
 import { reqAddLesson } from "@api/edu/lesson";
 import "./index.less";
 
@@ -49,6 +50,12 @@ export default function AddLesson({ location, history }) {
           >
             <Upload />
           </Form.Item>
+          {/* <Form.Item
+            name="image"
+            rules={[{ required: true, message: "请上传封面图片" }]}
+          >
+            <UploadImage />
+          </Form.Item> */}
           <Form.Item>
             <Button type="primary" htmlType="submit" className="lesson-btn">
               添加
