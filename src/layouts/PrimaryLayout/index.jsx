@@ -1,18 +1,16 @@
 import React, { Component } from "react";
-import { Layout, Menu, Breadcrumb } from "antd";
+import { connect } from "react-redux";
+import { Layout, Breadcrumb } from "antd";
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-  UploadOutlined,
-  TeamOutlined,
   GlobalOutlined,
 } from "@ant-design/icons";
 import "./index.less";
 import logo from "@assets/images/logo.png";
+import SideMenu from "../SideMenu";
 const { Header, Sider, Content } = Layout;
-const { SubMenu } = Menu;
+@connect((state) => ({ user: state.user }))
 class PrimaryLayout extends Component {
   state = {
     collapsed: false,
@@ -25,6 +23,7 @@ class PrimaryLayout extends Component {
   };
 
   render() {
+    const { user } = this.props;
     return (
       <Layout className="layout">
         <Sider trigger={null} collapsible collapsed={this.state.collapsed}>
@@ -32,21 +31,7 @@ class PrimaryLayout extends Component {
             <img src={logo} alt="logo" />
             {!this.state.collapsed && <h1>硅谷教育管理系统</h1>}
           </div>
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={["1"]}>
-            <Menu.Item key="1" icon={<UserOutlined />}>
-              nav 1
-            </Menu.Item>
-            <Menu.Item key="2" icon={<VideoCameraOutlined />}>
-              nav 2
-            </Menu.Item>
-            <Menu.Item key="3" icon={<UploadOutlined />}>
-              nav 3
-            </Menu.Item>
-            <SubMenu key="sub2" icon={<TeamOutlined />} title="Team">
-              <Menu.Item key="6">Team 1</Menu.Item>
-              <Menu.Item key="8">Team 2</Menu.Item>
-            </SubMenu>
-          </Menu>
+          <SideMenu />
         </Sider>
         <Layout className="layout-right">
           <Header className="layout-right-header">
@@ -58,8 +43,8 @@ class PrimaryLayout extends Component {
               }
             )}
             <div className="header-right">
-              <img src={logo} alt="avatar" />
-              <span>admin</span>
+              <img src={user.avatar} alt="avatar" />
+              <span>{user.name}</span>
               <GlobalOutlined />
             </div>
           </Header>

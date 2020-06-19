@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { getUserInfo, getMenu } from "./redux";
 import Loading from "../Loading";
 import PrimaryLayout from "../../layouts/PrimaryLayout";
+
 @connect(null, { getUserInfo, getMenu })
 class Authorized extends Component {
   state = {
@@ -17,6 +18,9 @@ class Authorized extends Component {
         isLoading: false,
       });
     });
+    console.log("aaa", this.props);
+    console.log("bbb", getUserInfo());
+    console.log("ccc", getMenu());
   }
   render() {
     const { isLoading } = this.state;
