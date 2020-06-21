@@ -13,6 +13,7 @@ import "./index.less";
 @connect(
   (state) => ({
     subjectList: state.subjectList,
+    permissionValueList: state.user.permissionValueList,
   }),
   { getSubjectList, getSubSubjectList, getUpdateSubject }
 )
@@ -144,7 +145,8 @@ class Subject extends Component {
   };
   render() {
     const { expandedRowKeys, current, pageSize } = this.state;
-    const { subjectList, getSubjectList } = this.props;
+    const { subjectList, permissionValueList } = this.props;
+    console.log(permissionValueList);
     const columns = [
       {
         title: "分类名称",
@@ -202,10 +204,13 @@ class Subject extends Component {
     ];
     return (
       <div className="subject">
-        <Button type="primary" onClick={this.addSubject}>
-          <PlusOutlined />
-          新建
-        </Button>
+        {permissionValueList.indexOf("subject.add") !== -1 && (
+          <Button type="primary" onClick={this.addSubject}>
+            <PlusOutlined />
+            新建
+          </Button>
+        )}
+
         <Table
           style={{ marginTop: 20 }}
           columns={columns}

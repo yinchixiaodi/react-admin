@@ -1,83 +1,50 @@
 import React, { Component, Suspense } from "react";
+import { Route, Redirect, Switch } from "react-router-dom";
 import PropTypes from "prop-types";
-import { Switch, Route, Redirect } from "react-router-dom";
 import { Spin } from "antd";
-
-import { defaultRoutes } from "@conf/routes";
 import asyncComps from "@conf/asyncComps";
-import NotFound from "@pages/404";
+import { defaultRoutes } from "@conf/routes";
 
-export default class AuthorizedRouter extends Component {
+class AuthorizedRouter extends Component {
   static propTypes = {
-    routes: PropTypes.array.isRequired,
+    permissionList: PropTypes.array.isRequired,
   };
-
-  renderRoutes = (routes, prefix = "") => {
-    const composeRoutes = routes.reduce((allRoutes, route) => {
-      const { children } = route;
-      // 过滤level:4的没有组件的菜单
-      if (!route.path) return allRoutes;
-
+  renderRoute = (menuList, parentPath = "") => {
+    return menuList.reduce((routes, menu) => {
+      // console.log(routes, menu);
+      const { component, redirect, children, path } = menu;
+      // console.log(asyncComps, component);
+      // 判断有没有路由组件
+      if (component) {
+        const Comp = asyncComps[component]();
+        // 如果有路由组件
+        routes.push(
+          <Route key={path} path={parentPath + path} component={Comp} exact />
+        );
+      }
+      // 判断有没有子组件
       if (children && children.length) {
-        const routes = this.renderRoutes(children, route.path);
-        allRoutes = allRoutes.concat(routes);
+        routes = routes.concat(this.renderRoute(children, path));
       }
-
-      const commonPath = prefix + route.path;
-
-      if (route.redirect && children && children.length) {
-        const item = (
-          <Redirect key={commonPath} from={commonPath} to={route.redirect} />
-        );
-        allRoutes.push(item);
-      } else {
-        const item = (
-          <Route
-            key={commonPath}
-            path={commonPath}
-            component={
-              asyncComps[route.component]
-                ? asyncComps[route.component]()
-                : NotFound
-            }
-            exact
-          />
-        );
-
-        allRoutes.push(item);
+      // 判断 redirect
+      if (redirect && redirect !== "noredirect") {
+        // 说明要重定向到redirect
+        // 只有路径是from的时候才会重定向到to
+        routes.push(<Redirect key={path} from={path} to={redirect} />);
       }
-
-      return allRoutes;
+      return routes;
     }, []);
-    return composeRoutes;
   };
-
   render() {
-    const { routes } = this.props;
-
-    const initRoutes = this.renderRoutes(defaultRoutes);
-    const asyncRoutes = this.renderRoutes(routes);
-
+    const { permissionList } = this.props;
     return (
-      <Suspense
-        fallback={
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: 300,
-            }}
-          >
-            <Spin size="large" />
-          </div>
-        }
-      >
+      <Suspense fallback={<Spin size="large" />}>
         <Switch>
-          {initRoutes}
-          {asyncRoutes}
+          {this.renderRoute(defaultRoutes)}
+          {this.renderRoute(permissionList)}
         </Switch>
       </Suspense>
     );
   }
 }
+export default AuthorizedRouter;

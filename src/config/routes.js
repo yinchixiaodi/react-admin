@@ -30,7 +30,8 @@ const defaultRoutes = [
   {
     name: "首页",
     path: "/",
-    component: "Adimin",
+    component: "Admin",
+    icon: "home",
   },
 ];
 

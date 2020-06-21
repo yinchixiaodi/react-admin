@@ -26,3 +26,11 @@ export const filterPermissions = (permissions, key) => {
     return roles;
   }, {});
 };
+
+export const filterPermissions1 = (permissions, key) => {
+  return permissions
+    .filter((value) => value.indexOf(key) !== -1)
+    .reduce((p, c) => {
+      return (p[c] = true);
+    }, {});
+};

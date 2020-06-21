@@ -35,21 +35,26 @@ class SideMenu extends Component {
   };
   // 默认展开的菜单的地址
   getOpenKeys = (pathname) => {
-    console.log(pathname);
+    // console.log(pathname);
     if (pathname === "/") return [];
     return ["/" + pathname.split("/")[1]];
   };
   render() {
     const {
       permissionList,
-      location: { pathname },
+      // location: { pathname },
+      currentRoute,
     } = this.props;
+    const pathname = currentRoute.children
+      ? currentRoute.children.path
+      : currentRoute.path;
     return (
       <Menu
         theme="dark"
         mode="inline"
         defaultSelectedKeys={[pathname]} // 默认选中的菜单
-        defaultOpenKeys={this.getOpenKeys(pathname)} // 默认展示的菜单（值是数组）
+        // defaultOpenKeys={this.getOpenKeys(pathname)} // 默认展示的菜单（值是数组）
+        defaultOpenKeys={[currentRoute.path]} // 默认展示的菜单（值是数组）
       >
         {this.randerMenu(defaultRoutes)}
         {this.randerMenu(permissionList)}

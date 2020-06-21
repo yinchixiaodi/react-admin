@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { getUserInfo, getMenu } from "./redux";
 import Loading from "../Loading";
-import PrimaryLayout from "../../layouts/PrimaryLayout";
+// import PrimaryLayout from "../../layouts/PrimaryLayout";
 
 @connect(null, { getUserInfo, getMenu })
 class Authorized extends Component {
@@ -24,7 +24,7 @@ class Authorized extends Component {
   }
   render() {
     const { isLoading } = this.state;
-    return isLoading ? <Loading /> : <PrimaryLayout />;
+    return isLoading ? <Loading /> : this.props.children;
   }
 }
 export default Authorized;
